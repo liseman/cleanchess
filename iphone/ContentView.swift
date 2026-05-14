@@ -138,12 +138,60 @@ struct MinimalPieceView: View {
     let inverted: Bool
 
     var body: some View {
-        Text(piece.glyph)
-            .font(.system(size: 34, weight: .regular, design: .serif))
-            .minimumScaleFactor(0.4)
-            .lineLimit(1)
-            .foregroundColor(inverted ? .white : .black)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        if piece.type == .pawn {
+            PawnPieceView(isWhite: piece.player == .white, inverted: inverted)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            Text(piece.glyph)
+                .font(.system(size: 34, weight: .regular, design: .serif))
+                .minimumScaleFactor(0.4)
+                .lineLimit(1)
+                .foregroundColor(inverted ? .white : .black)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
+struct PawnPieceView: View {
+    let isWhite: Bool
+    let inverted: Bool
+
+    var body: some View {
+        let fill = inverted ? Color.white : (isWhite ? Color.white : Color.black)
+        let stroke = inverted ? Color.white : Color.black
+
+        return GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            ZStack {
+                Circle()
+                    .fill(fill)
+                    .overlay(Circle().stroke(stroke, lineWidth: 1.5))
+                    .frame(width: w * 0.28, height: h * 0.28)
+                    .offset(y: -h * 0.18)
+                PawnBodyShape()
+                    .fill(fill)
+                    .overlay(PawnBodyShape().stroke(stroke, lineWidth: 1.5))
+                    .frame(width: w * 0.38, height: h * 0.32)
+                    .offset(y: h * 0.02)
+                RoundedRectangle(cornerRadius: h * 0.05)
+                    .fill(fill)
+                    .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                    .frame(width: w * 0.46, height: h * 0.1)
+                    .offset(y: h * 0.3)
+            }
+        }
+    }
+}
+
+struct PawnBodyShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + rect.width * 0.2, y: rect.maxY))
+        path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.minY), control: CGPoint(x: rect.minX + rect.width * 0.28, y: rect.minY + rect.height * 0.18))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - rect.width * 0.2, y: rect.maxY), control: CGPoint(x: rect.maxX - rect.width * 0.28, y: rect.minY + rect.height * 0.18))
+        path.closeSubpath()
+        return path
     }
 }
 

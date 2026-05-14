@@ -115,6 +115,12 @@
         .piece--black {
             color: var(--text);
         }
+
+        .piece svg {
+            width: 72%;
+            height: 72%;
+            overflow: visible;
+        }
         
         #controls {
             margin-top: 18px;
@@ -199,8 +205,14 @@
                     const piece = board[row][col];
                     if (piece) {
                         const pieceEl = document.createElement('div');
-                        pieceEl.className = 'piece ' + (piece === piece.toUpperCase() ? 'piece--white' : 'piece--black');
-                        pieceEl.textContent = pieces[piece];
+                        const isWhite = piece === piece.toUpperCase();
+                        const inverted = !!selectedSquare && selectedSquare.row === row && selectedSquare.col === col;
+                        pieceEl.className = 'piece ' + (isWhite ? 'piece--white' : 'piece--black');
+                        if (piece.toLowerCase() === 'p') {
+                            pieceEl.innerHTML = getPawnSVG(isWhite, inverted);
+                        } else {
+                            pieceEl.textContent = pieces[piece];
+                        }
                         square.appendChild(pieceEl);
                     }
                     
@@ -260,6 +272,17 @@
             });
         }
         
+        function getPawnSVG(isWhite, inverted = false) {
+            const fill = inverted ? '#ffffff' : (isWhite ? '#ffffff' : '#111111');
+            const stroke = inverted ? '#ffffff' : '#111111';
+            return `
+                <svg viewBox="0 0 44 44" aria-hidden="true">
+                    <circle cx="22" cy="13.5" r="6.2" fill="${fill}" stroke="${stroke}" stroke-width="1.8" />
+                    <path d="M15.5 35.5C15.5 27.5 18.5 22 22 22C25.5 22 28.5 27.5 28.5 35.5" fill="${fill}" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round"/>
+                    <rect x="12" y="35" width="20" height="4.5" rx="2.2" fill="${fill}" stroke="${stroke}" stroke-width="1.8" />
+                </svg>`;
+        }
+
         function isCurrentPlayerPiece(piece) {
             if (currentPlayer === 'white') {
                 return piece === piece.toUpperCase();

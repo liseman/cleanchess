@@ -35,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -170,14 +172,36 @@ fun ChessBoard(game: ChessGameState, boardSize: androidx.compose.ui.unit.Dp) {
 
 @Composable
 fun MinimalPiece(piece: Piece, inverted: Boolean) {
-    Text(
-        text = piece.glyph,
-        color = if (inverted) Color.White else Color.Black,
-        fontSize = 34.sp,
-        fontFamily = FontFamily.Serif,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
-    )
+    if (piece.type == PieceType.PAWN) {
+        val isWhite = piece.player == Player.WHITE
+        val fill = if (inverted) Color.White else if (isWhite) Color.White else Color.Black
+        val stroke = if (inverted) Color.White else Color.Black
+        Canvas(modifier = Modifier.size(42.dp)) {
+            val w = size.width
+            val h = size.height
+            drawCircle(fill, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f))
+            drawCircle(stroke, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f), style = Stroke(width = 2f))
+            val body = Path().apply {
+                moveTo(w * 0.31f, h * 0.72f)
+                quadraticTo(w * 0.36f, h * 0.48f, w * 0.5f, h * 0.48f)
+                quadraticTo(w * 0.64f, h * 0.48f, w * 0.69f, h * 0.72f)
+                close()
+            }
+            drawPath(body, fill)
+            drawPath(body, stroke, style = Stroke(width = 2f))
+            drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+            drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+        }
+    } else {
+        Text(
+            text = piece.glyph,
+            color = if (inverted) Color.White else Color.Black,
+            fontSize = 34.sp,
+            fontFamily = FontFamily.Serif,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 enum class Player { WHITE, BLACK }
