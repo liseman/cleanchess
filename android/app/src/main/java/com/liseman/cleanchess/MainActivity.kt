@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -63,35 +63,40 @@ class MainActivity : ComponentActivity() {
 fun CleanChessApp() {
     val game = remember { ChessGameState() }
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(20.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = game.statusText.uppercase(),
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 1.2.sp,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 18.dp)
-        )
+        val boardSize = minOf(maxWidth, maxHeight - 150.dp)
 
-        ChessBoard(game = game)
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MinimalActionButton("New Game", Modifier.weight(1f)) { game.newGame() }
-            MinimalActionButton("Undo", Modifier.weight(1f)) { game.undoMove() }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = game.statusText.uppercase(),
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 1.2.sp,
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 18.dp)
+            )
+
+            ChessBoard(game = game, boardSize = boardSize)
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MinimalActionButton("New Game", Modifier.weight(1f)) { game.newGame() }
+                MinimalActionButton("Undo", Modifier.weight(1f)) { game.undoMove() }
+            }
         }
     }
 }
@@ -114,11 +119,10 @@ fun MinimalActionButton(text: String, modifier: Modifier = Modifier, onClick: ()
 }
 
 @Composable
-fun ChessBoard(game: ChessGameState) {
+fun ChessBoard(game: ChessGameState, boardSize: androidx.compose.ui.unit.Dp) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
+            .size(boardSize)
             .border(1.5.dp, Color.Black)
     ) {
         for (row in 0 until 8) {
@@ -165,112 +169,13 @@ fun ChessBoard(game: ChessGameState) {
 
 @Composable
 fun MinimalPiece(piece: Piece, inverted: Boolean) {
-    val isWhite = piece.player == Player.WHITE
-    val fill = if (inverted) Color.White else if (isWhite) Color.White else Color.Black
-    val detail = if (inverted) Color.Black else if (isWhite) Color.Black else Color.White
-    val stroke = if (inverted) Color.White else Color.Black
-
-    Canvas(modifier = Modifier.size(42.dp)) {
-        val w = size.width
-        val h = size.height
-
-        when (piece.type) {
-            PieceType.PAWN -> {
-                drawCircle(fill, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f))
-                drawCircle(stroke, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f), style = Stroke(width = 2f))
-                val body = Path().apply {
-                    moveTo(w * 0.31f, h * 0.72f)
-                    quadraticTo(w * 0.36f, h * 0.48f, w * 0.5f, h * 0.48f)
-                    quadraticTo(w * 0.64f, h * 0.48f, w * 0.69f, h * 0.72f)
-                    close()
-                }
-                drawPath(body, fill)
-                drawPath(body, stroke, style = Stroke(width = 2f))
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-            PieceType.ROOK -> {
-                repeat(3) { i ->
-                    val x = w * (0.24f + i * 0.16f)
-                    drawRect(fill, topLeft = Offset(x, h * 0.14f), size = androidx.compose.ui.geometry.Size(w * 0.1f, h * 0.12f))
-                    drawRect(stroke, topLeft = Offset(x, h * 0.14f), size = androidx.compose.ui.geometry.Size(w * 0.1f, h * 0.12f), style = Stroke(width = 2f))
-                }
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.26f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.34f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.04f, w * 0.04f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.26f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.34f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.04f, w * 0.04f), style = Stroke(width = 2f))
-                drawRoundRect(fill, topLeft = Offset(w * 0.2f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.6f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.2f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.6f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-            PieceType.BISHOP -> {
-                val bishop = Path().apply {
-                    moveTo(w * 0.5f, h * 0.14f)
-                    quadraticTo(w * 0.22f, h * 0.28f, w * 0.22f, h * 0.48f)
-                    quadraticTo(w * 0.22f, h * 0.84f, w * 0.5f, h * 0.72f)
-                    quadraticTo(w * 0.78f, h * 0.84f, w * 0.78f, h * 0.48f)
-                    quadraticTo(w * 0.78f, h * 0.28f, w * 0.5f, h * 0.14f)
-                    close()
-                }
-                drawPath(bishop, fill)
-                drawPath(bishop, stroke, style = Stroke(width = 2f))
-                drawLine(detail, Offset(w * 0.4f, h * 0.34f), Offset(w * 0.6f, h * 0.55f), strokeWidth = 2.2f)
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-            PieceType.KNIGHT -> {
-                val knight = Path().apply {
-                    moveTo(w * 0.74f, h * 0.76f)
-                    lineTo(w * 0.24f, h * 0.76f)
-                    quadraticTo(w * 0.26f, h * 0.56f, w * 0.38f, h * 0.48f)
-                    lineTo(w * 0.24f, h * 0.34f)
-                    lineTo(w * 0.34f, h * 0.12f)
-                    lineTo(w * 0.66f, h * 0.12f)
-                    quadraticTo(w * 0.84f, h * 0.28f, w * 0.8f, h * 0.56f)
-                    quadraticTo(w * 0.8f, h * 0.68f, w * 0.74f, h * 0.76f)
-                    close()
-                }
-                drawPath(knight, fill)
-                drawPath(knight, stroke, style = Stroke(width = 2f))
-                drawCircle(detail, radius = w * 0.025f, center = Offset(w * 0.62f, h * 0.28f))
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-            PieceType.QUEEN -> {
-                val queen = Path().apply {
-                    moveTo(w * 0.18f, h * 0.34f)
-                    lineTo(w * 0.28f, h * 0.16f)
-                    lineTo(w * 0.5f, h * 0.28f)
-                    lineTo(w * 0.72f, h * 0.16f)
-                    lineTo(w * 0.82f, h * 0.34f)
-                    lineTo(w * 0.72f, h * 0.72f)
-                    lineTo(w * 0.28f, h * 0.72f)
-                    close()
-                }
-                drawPath(queen, fill)
-                drawPath(queen, stroke, style = Stroke(width = 2f))
-                listOf(0.28f to 0.16f, 0.5f to 0.26f, 0.72f to 0.16f).forEach { (x, y) ->
-                    drawCircle(stroke, radius = w * 0.035f, center = Offset(w * x, h * y))
-                }
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-            PieceType.KING -> {
-                drawLine(stroke, Offset(w * 0.5f, h * 0.12f), Offset(w * 0.5f, h * 0.26f), strokeWidth = 2.6f)
-                drawLine(stroke, Offset(w * 0.42f, h * 0.18f), Offset(w * 0.58f, h * 0.18f), strokeWidth = 2.6f)
-                val king = Path().apply {
-                    moveTo(w * 0.24f, h * 0.34f)
-                    quadraticTo(w * 0.22f, h * 0.68f, w * 0.32f, h * 0.72f)
-                    lineTo(w * 0.68f, h * 0.72f)
-                    quadraticTo(w * 0.78f, h * 0.68f, w * 0.76f, h * 0.34f)
-                    quadraticTo(w * 0.68f, h * 0.12f, w * 0.5f, h * 0.22f)
-                    quadraticTo(w * 0.32f, h * 0.12f, w * 0.24f, h * 0.34f)
-                    close()
-                }
-                drawPath(king, fill)
-                drawPath(king, stroke, style = Stroke(width = 2f))
-                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f))
-                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.1f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
-            }
-        }
-    }
+    Text(
+        text = piece.glyph,
+        color = if (inverted) Color.White else Color.Black,
+        fontSize = 34.sp,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 enum class Player { WHITE, BLACK }
@@ -279,13 +184,19 @@ enum class PieceType { KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN }
 
 data class Piece(val type: PieceType, val player: Player) {
     val glyph: String
-        get() = when (type) {
-            PieceType.KING -> "K"
-            PieceType.QUEEN -> "Q"
-            PieceType.ROOK -> "R"
-            PieceType.BISHOP -> "B"
-            PieceType.KNIGHT -> "N"
-            PieceType.PAWN -> "P"
+        get() = when (type to player) {
+            PieceType.KING to Player.WHITE -> "♔"
+            PieceType.QUEEN to Player.WHITE -> "♕"
+            PieceType.ROOK to Player.WHITE -> "♖"
+            PieceType.BISHOP to Player.WHITE -> "♗"
+            PieceType.KNIGHT to Player.WHITE -> "♘"
+            PieceType.PAWN to Player.WHITE -> "♙"
+            PieceType.KING to Player.BLACK -> "♚"
+            PieceType.QUEEN to Player.BLACK -> "♛"
+            PieceType.ROOK to Player.BLACK -> "♜"
+            PieceType.BISHOP to Player.BLACK -> "♝"
+            PieceType.KNIGHT to Player.BLACK -> "♞"
+            PieceType.PAWN to Player.BLACK -> "♟"
         }
 }
 
