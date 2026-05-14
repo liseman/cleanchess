@@ -193,11 +193,11 @@ data class Piece(val type: PieceType, val player: Player) {
             PieceType.BISHOP to Player.WHITE -> "♗"
             PieceType.KNIGHT to Player.WHITE -> "♘"
             PieceType.PAWN to Player.WHITE -> "♙"
-            PieceType.KING to Player.BLACK -> "♔"
-            PieceType.QUEEN to Player.BLACK -> "♕"
-            PieceType.ROOK to Player.BLACK -> "♖"
-            PieceType.BISHOP to Player.BLACK -> "♗"
-            PieceType.KNIGHT to Player.BLACK -> "♘"
+            PieceType.KING to Player.BLACK -> "♚"
+            PieceType.QUEEN to Player.BLACK -> "♛"
+            PieceType.ROOK to Player.BLACK -> "♜"
+            PieceType.BISHOP to Player.BLACK -> "♝"
+            PieceType.KNIGHT to Player.BLACK -> "♞"
             PieceType.PAWN to Player.BLACK -> "♙"
         }
 }

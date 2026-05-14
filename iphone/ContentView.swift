@@ -575,11 +575,11 @@ struct Piece {
         case (.bishop, .white): return "♗"
         case (.knight, .white): return "♘"
         case (.pawn, .white): return "♙"
-        case (.king, .black): return "♔"
-        case (.queen, .black): return "♕"
-        case (.rook, .black): return "♖"
-        case (.bishop, .black): return "♗"
-        case (.knight, .black): return "♘"
+        case (.king, .black): return "♚"
+        case (.queen, .black): return "♛"
+        case (.rook, .black): return "♜"
+        case (.bishop, .black): return "♝"
+        case (.knight, .black): return "♞"
         case (.pawn, .black): return "♙"
         }
     }
