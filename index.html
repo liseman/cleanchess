@@ -101,24 +101,15 @@
         .piece {
             width: 44px;
             height: 44px;
-            border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            border: 1.5px solid var(--line);
         }
 
-        .piece--white {
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        .piece--black {
-            background: var(--text);
-            color: var(--bg);
+        .piece svg {
+            width: 44px;
+            height: 44px;
+            overflow: visible;
         }
         
         #controls {
@@ -160,8 +151,8 @@
 
     <script>
         const pieces = {
-            'K': 'K', 'Q': 'Q', 'R': 'R', 'B': 'B', 'N': 'N', 'P': 'P',
-            'k': 'K', 'q': 'Q', 'r': 'R', 'b': 'B', 'n': 'N', 'p': 'P'
+            'K': 'king', 'Q': 'queen', 'R': 'rook', 'B': 'bishop', 'N': 'knight', 'P': 'pawn',
+            'k': 'king', 'q': 'queen', 'r': 'rook', 'b': 'bishop', 'n': 'knight', 'p': 'pawn'
         };
         
         let board = [];
@@ -204,8 +195,9 @@
                     const piece = board[row][col];
                     if (piece) {
                         const pieceEl = document.createElement('div');
-                        pieceEl.className = 'piece ' + (piece === piece.toUpperCase() ? 'piece--white' : 'piece--black');
-                        pieceEl.textContent = pieces[piece];
+                        const inverted = !!selectedSquare && selectedSquare.row === row && selectedSquare.col === col;
+                        pieceEl.className = 'piece';
+                        pieceEl.innerHTML = getPieceSVG(piece, inverted);
                         square.appendChild(pieceEl);
                     }
                     
@@ -265,6 +257,59 @@
             });
         }
         
+        function getPieceSVG(piece, inverted = false) {
+            const type = pieces[piece];
+            const isWhite = piece === piece.toUpperCase();
+            const fill = inverted ? '#ffffff' : (isWhite ? '#ffffff' : '#111111');
+            const stroke = inverted ? '#ffffff' : '#111111';
+            const detail = inverted ? '#111111' : (isWhite ? '#111111' : '#ffffff');
+
+            const common = {
+                fill, stroke, detail,
+                strokeWidth: 1.8
+            };
+
+            const icons = {
+                pawn: `
+                    <circle cx="22" cy="13.5" r="6.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <path d="M15.5 35.5C15.5 27.5 18.5 22 22 22C25.5 22 28.5 27.5 28.5 35.5" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" stroke-linecap="round"/>
+                    <rect x="12" y="35" width="20" height="4.5" rx="2.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `,
+                rook: `
+                    <rect x="12" y="8.5" width="4" height="6" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <rect x="20" y="8.5" width="4" height="6" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <rect x="28" y="8.5" width="4" height="6" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <rect x="12" y="14" width="20" height="18" rx="2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <rect x="10" y="33.5" width="24" height="5" rx="2.5" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `,
+                bishop: `
+                    <path d="M22 8C16 13 14 18 14 23C14 28.5 17.2 32.5 22 32.5C26.8 32.5 30 28.5 30 23C30 18 28 13 22 8Z" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                    <path d="M18 18L26.5 27" stroke="${common.detail}" stroke-width="1.9" stroke-linecap="round" />
+                    <rect x="12" y="34.5" width="20" height="4.5" rx="2.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `,
+                knight: `
+                    <path d="M29.5 35.5H14.5C15.5 27.5 18 23.5 22 20L18 16L20.5 10.5H28C31 12.5 32.5 16 32.5 20C32.5 24.5 31.5 29.5 29.5 35.5Z" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" stroke-linejoin="round" />
+                    <circle cx="26.5" cy="15.5" r="1.4" fill="${common.detail}" />
+                    <rect x="12.5" y="35" width="20" height="4.5" rx="2.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `,
+                queen: `
+                    <path d="M12 17L16 10L22 15L28 10L32 17L29.5 31H14.5L12 17Z" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" stroke-linejoin="round" />
+                    <circle cx="16" cy="9" r="1.8" fill="${common.stroke}" />
+                    <circle cx="22" cy="13.5" r="1.8" fill="${common.stroke}" />
+                    <circle cx="28" cy="9" r="1.8" fill="${common.stroke}" />
+                    <rect x="12" y="34.5" width="20" height="4.5" rx="2.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `,
+                king: `
+                    <path d="M22 7V14" stroke="${common.stroke}" stroke-width="2.1" stroke-linecap="round" />
+                    <path d="M18.5 10.5H25.5" stroke="${common.stroke}" stroke-width="2.1" stroke-linecap="round" />
+                    <path d="M14 17C15 13.5 18 12 22 12C26 12 29 13.5 30 17L28.5 31H15.5L14 17Z" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" stroke-linejoin="round" />
+                    <rect x="12" y="34.5" width="20" height="4.5" rx="2.2" fill="${common.fill}" stroke="${common.stroke}" stroke-width="${common.strokeWidth}" />
+                `
+            };
+
+            return `<svg viewBox="0 0 44 44" aria-hidden="true">${icons[type]}</svg>`;
+        }
+
         function isCurrentPlayerPiece(piece) {
             if (currentPlayer === 'white') {
                 return piece === piece.toUpperCase();

@@ -13,15 +13,22 @@ Or open `index.html` in any web browser.
 - Classic chess for 2 players (in-person)
 - Valid move highlighting
 - Check and checkmate detection
+- Castling support
 - Pawn promotion to Queen
 - New Game button
 - Undo Move button
 - Clean, minimal interface
 
+## App Folders
+
+- `iphone/` — SwiftUI iPhone version
+- `android/` — Jetpack Compose Android version
+- `index.html` — browser version
+
 ## Rules
 
 - Click a piece to select it
-- Valid moves will be highlighted (green dots for moves, red circles for captures)
+- Valid moves will be highlighted
 - Click a highlighted square to move
 - The game enforces all standard chess rules
 - Pawns automatically promote to Queens when reaching the opposite end
