@@ -39,6 +39,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -173,6 +174,7 @@ fun MinimalPiece(piece: Piece, inverted: Boolean) {
         text = piece.glyph,
         color = if (inverted) Color.White else Color.Black,
         fontSize = 34.sp,
+        fontFamily = FontFamily.Serif,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth()
     )
@@ -191,12 +193,12 @@ data class Piece(val type: PieceType, val player: Player) {
             PieceType.BISHOP to Player.WHITE -> "♗"
             PieceType.KNIGHT to Player.WHITE -> "♘"
             PieceType.PAWN to Player.WHITE -> "♙"
-            PieceType.KING to Player.BLACK -> "♚"
-            PieceType.QUEEN to Player.BLACK -> "♛"
-            PieceType.ROOK to Player.BLACK -> "♜"
-            PieceType.BISHOP to Player.BLACK -> "♝"
-            PieceType.KNIGHT to Player.BLACK -> "♞"
-            PieceType.PAWN to Player.BLACK -> "♟"
+            PieceType.KING to Player.BLACK -> "♔"
+            PieceType.QUEEN to Player.BLACK -> "♕"
+            PieceType.ROOK to Player.BLACK -> "♖"
+            PieceType.BISHOP to Player.BLACK -> "♗"
+            PieceType.KNIGHT to Player.BLACK -> "♘"
+            PieceType.PAWN to Player.BLACK -> "♙"
         }
 }
 

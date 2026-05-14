@@ -139,7 +139,7 @@ struct MinimalPieceView: View {
 
     var body: some View {
         Text(piece.glyph)
-            .font(.system(size: 34, weight: .regular))
+            .font(.system(size: 34, weight: .regular, design: .serif))
             .minimumScaleFactor(0.4)
             .lineLimit(1)
             .foregroundColor(inverted ? .white : .black)
@@ -575,12 +575,12 @@ struct Piece {
         case (.bishop, .white): return "♗"
         case (.knight, .white): return "♘"
         case (.pawn, .white): return "♙"
-        case (.king, .black): return "♚"
-        case (.queen, .black): return "♛"
-        case (.rook, .black): return "♜"
-        case (.bishop, .black): return "♝"
-        case (.knight, .black): return "♞"
-        case (.pawn, .black): return "♟"
+        case (.king, .black): return "♔"
+        case (.queen, .black): return "♕"
+        case (.rook, .black): return "♖"
+        case (.bishop, .black): return "♗"
+        case (.knight, .black): return "♘"
+        case (.pawn, .black): return "♙"
         }
     }
 }
