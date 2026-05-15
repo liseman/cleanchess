@@ -172,35 +172,110 @@ fun ChessBoard(game: ChessGameState, boardSize: androidx.compose.ui.unit.Dp) {
 
 @Composable
 fun MinimalPiece(piece: Piece, inverted: Boolean) {
-    if (piece.type == PieceType.PAWN) {
-        val isWhite = piece.player == Player.WHITE
-        val fill = if (inverted) Color.White else if (isWhite) Color.White else Color.Black
-        val stroke = if (inverted) Color.White else Color.Black
-        Canvas(modifier = Modifier.size(42.dp)) {
-            val w = size.width
-            val h = size.height
-            drawCircle(fill, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f))
-            drawCircle(stroke, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f), style = Stroke(width = 2f))
-            val body = Path().apply {
-                moveTo(w * 0.31f, h * 0.72f)
-                quadraticTo(w * 0.36f, h * 0.48f, w * 0.5f, h * 0.48f)
-                quadraticTo(w * 0.64f, h * 0.48f, w * 0.69f, h * 0.72f)
-                close()
+    val isWhite = piece.player == Player.WHITE
+    val fill = if (inverted) Color.White else if (isWhite) Color.White else Color.Black
+    val detail = if (inverted) Color.Black else if (isWhite) Color.Black else Color.White
+    val stroke = if (inverted) Color.White else Color.Black
+
+    Canvas(modifier = Modifier.size(42.dp)) {
+        val w = size.width
+        val h = size.height
+
+        when (piece.type) {
+            PieceType.PAWN -> {
+                drawCircle(fill, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f))
+                drawCircle(stroke, radius = w * 0.14f, center = Offset(w * 0.5f, h * 0.3f), style = Stroke(width = 2f))
+                val body = Path().apply {
+                    moveTo(w * 0.31f, h * 0.72f)
+                    quadraticTo(w * 0.36f, h * 0.48f, w * 0.5f, h * 0.48f)
+                    quadraticTo(w * 0.64f, h * 0.48f, w * 0.69f, h * 0.72f)
+                    close()
+                }
+                drawPath(body, fill)
+                drawPath(body, stroke, style = Stroke(width = 2f))
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
             }
-            drawPath(body, fill)
-            drawPath(body, stroke, style = Stroke(width = 2f))
-            drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
-            drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            PieceType.ROOK -> {
+                repeat(3) { i ->
+                    val x = w * (0.24f + i * 0.16f)
+                    drawRect(fill, topLeft = Offset(x, h * 0.14f), size = Size(w * 0.1f, h * 0.12f))
+                    drawRect(stroke, topLeft = Offset(x, h * 0.14f), size = Size(w * 0.1f, h * 0.12f), style = Stroke(width = 2f))
+                }
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.26f), size = Size(w * 0.52f, h * 0.34f), cornerRadius = CornerRadius(w * 0.04f, w * 0.04f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.26f), size = Size(w * 0.52f, h * 0.34f), cornerRadius = CornerRadius(w * 0.04f, w * 0.04f), style = Stroke(width = 2f))
+                drawRoundRect(fill, topLeft = Offset(w * 0.2f, h * 0.76f), size = Size(w * 0.6f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.2f, h * 0.76f), size = Size(w * 0.6f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            }
+            PieceType.BISHOP -> {
+                val bishop = Path().apply {
+                    moveTo(w * 0.5f, h * 0.14f)
+                    quadraticTo(w * 0.22f, h * 0.28f, w * 0.22f, h * 0.48f)
+                    quadraticTo(w * 0.22f, h * 0.84f, w * 0.5f, h * 0.72f)
+                    quadraticTo(w * 0.78f, h * 0.84f, w * 0.78f, h * 0.48f)
+                    quadraticTo(w * 0.78f, h * 0.28f, w * 0.5f, h * 0.14f)
+                    close()
+                }
+                drawPath(bishop, fill)
+                drawPath(bishop, stroke, style = Stroke(width = 2f))
+                drawLine(detail, Offset(w * 0.4f, h * 0.34f), Offset(w * 0.6f, h * 0.55f), strokeWidth = 2.2f)
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            }
+            PieceType.KNIGHT -> {
+                val knight = Path().apply {
+                    moveTo(w * 0.74f, h * 0.76f)
+                    lineTo(w * 0.24f, h * 0.76f)
+                    quadraticTo(w * 0.26f, h * 0.56f, w * 0.38f, h * 0.48f)
+                    lineTo(w * 0.24f, h * 0.34f)
+                    lineTo(w * 0.34f, h * 0.12f)
+                    lineTo(w * 0.66f, h * 0.12f)
+                    quadraticTo(w * 0.84f, h * 0.28f, w * 0.8f, h * 0.56f)
+                    quadraticTo(w * 0.8f, h * 0.68f, w * 0.74f, h * 0.76f)
+                    close()
+                }
+                drawPath(knight, fill)
+                drawPath(knight, stroke, style = Stroke(width = 2f))
+                drawCircle(detail, radius = w * 0.025f, center = Offset(w * 0.62f, h * 0.28f))
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            }
+            PieceType.QUEEN -> {
+                val queen = Path().apply {
+                    moveTo(w * 0.18f, h * 0.34f)
+                    lineTo(w * 0.28f, h * 0.16f)
+                    lineTo(w * 0.5f, h * 0.28f)
+                    lineTo(w * 0.72f, h * 0.16f)
+                    lineTo(w * 0.82f, h * 0.34f)
+                    lineTo(w * 0.72f, h * 0.72f)
+                    lineTo(w * 0.28f, h * 0.72f)
+                    close()
+                }
+                drawPath(queen, fill)
+                drawPath(queen, stroke, style = Stroke(width = 2f))
+                listOf(0.28f to 0.16f, 0.5f to 0.26f, 0.72f to 0.16f).forEach { (x, y) ->
+                    drawCircle(stroke, radius = w * 0.035f, center = Offset(w * x, h * y))
+                }
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            }
+            PieceType.KING -> {
+                drawLine(stroke, Offset(w * 0.5f, h * 0.12f), Offset(w * 0.5f, h * 0.26f), strokeWidth = 2.6f)
+                drawLine(stroke, Offset(w * 0.42f, h * 0.18f), Offset(w * 0.58f, h * 0.18f), strokeWidth = 2.6f)
+                val king = Path().apply {
+                    moveTo(w * 0.24f, h * 0.34f)
+                    quadraticTo(w * 0.22f, h * 0.68f, w * 0.32f, h * 0.72f)
+                    lineTo(w * 0.68f, h * 0.72f)
+                    quadraticTo(w * 0.78f, h * 0.68f, w * 0.76f, h * 0.34f)
+                    quadraticTo(w * 0.5f, h * 0.14f, w * 0.24f, h * 0.34f)
+                    close()
+                }
+                drawPath(king, fill)
+                drawPath(king, stroke, style = Stroke(width = 2f))
+                drawRoundRect(fill, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f))
+                drawRoundRect(stroke, topLeft = Offset(w * 0.24f, h * 0.76f), size = Size(w * 0.52f, h * 0.1f), cornerRadius = CornerRadius(w * 0.05f, w * 0.05f), style = Stroke(width = 2f))
+            }
         }
-    } else {
-        Text(
-            text = piece.glyph,
-            color = if (inverted) Color.White else Color.Black,
-            fontSize = 34.sp,
-            fontFamily = FontFamily.Serif,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 

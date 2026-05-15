@@ -138,47 +138,117 @@ struct MinimalPieceView: View {
     let inverted: Bool
 
     var body: some View {
-        if piece.type == .pawn {
-            PawnPieceView(isWhite: piece.player == .white, inverted: inverted)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            Text(piece.glyph)
-                .font(.system(size: 34, weight: .regular, design: .serif))
-                .minimumScaleFactor(0.4)
-                .lineLimit(1)
-                .foregroundColor(inverted ? .white : .black)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-    }
-}
-
-struct PawnPieceView: View {
-    let isWhite: Bool
-    let inverted: Bool
-
-    var body: some View {
+        let isWhite = piece.player == .white
         let fill = inverted ? Color.white : (isWhite ? Color.white : Color.black)
+        let detail = inverted ? Color.black : (isWhite ? Color.black : Color.white)
         let stroke = inverted ? Color.white : Color.black
 
         return GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
             ZStack {
-                Circle()
-                    .fill(fill)
-                    .overlay(Circle().stroke(stroke, lineWidth: 1.5))
-                    .frame(width: w * 0.28, height: h * 0.28)
-                    .offset(y: -h * 0.18)
-                PawnBodyShape()
-                    .fill(fill)
-                    .overlay(PawnBodyShape().stroke(stroke, lineWidth: 1.5))
-                    .frame(width: w * 0.38, height: h * 0.32)
-                    .offset(y: h * 0.02)
-                RoundedRectangle(cornerRadius: h * 0.05)
-                    .fill(fill)
-                    .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
-                    .frame(width: w * 0.46, height: h * 0.1)
-                    .offset(y: h * 0.3)
+                switch piece.type {
+                case .pawn:
+                    Circle()
+                        .fill(fill)
+                        .overlay(Circle().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.28, height: h * 0.28)
+                        .offset(y: -h * 0.18)
+                    PawnBodyShape()
+                        .fill(fill)
+                        .overlay(PawnBodyShape().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.38, height: h * 0.32)
+                        .offset(y: h * 0.02)
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.46, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                case .rook:
+                    HStack(spacing: w * 0.05) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            Rectangle().fill(fill).overlay(Rectangle().stroke(stroke, lineWidth: 1.5))
+                        }
+                    }
+                    .frame(width: w * 0.45, height: h * 0.12)
+                    .offset(y: -h * 0.24)
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.45, height: h * 0.34)
+                        .offset(y: -h * 0.01)
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.52, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                case .bishop:
+                    BishopShape()
+                        .fill(fill)
+                        .overlay(BishopShape().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.42, height: h * 0.58)
+                        .offset(y: -h * 0.03)
+                    Path { path in
+                        path.move(to: CGPoint(x: w * 0.41, y: h * 0.30))
+                        path.addLine(to: CGPoint(x: w * 0.59, y: h * 0.48))
+                    }
+                    .stroke(detail, style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.46, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                case .knight:
+                    KnightShape()
+                        .fill(fill)
+                        .overlay(KnightShape().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.56, height: h * 0.62)
+                        .offset(y: -h * 0.02)
+                    Circle()
+                        .fill(detail)
+                        .frame(width: w * 0.05, height: h * 0.05)
+                        .offset(x: w * 0.10, y: -h * 0.16)
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.5, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                case .queen:
+                    QueenShape()
+                        .fill(fill)
+                        .overlay(QueenShape().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.56, height: h * 0.58)
+                        .offset(y: -h * 0.05)
+                    ForEach([0.29, 0.5, 0.71], id: \.self) { x in
+                        Circle()
+                            .fill(stroke)
+                            .frame(width: w * 0.07, height: h * 0.07)
+                            .position(x: w * x, y: h * (x == 0.5 ? 0.25 : 0.16))
+                    }
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.5, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                case .king:
+                    Path { path in
+                        path.move(to: CGPoint(x: w * 0.5, y: h * 0.1))
+                        path.addLine(to: CGPoint(x: w * 0.5, y: h * 0.24))
+                        path.move(to: CGPoint(x: w * 0.42, y: h * 0.17))
+                        path.addLine(to: CGPoint(x: w * 0.58, y: h * 0.17))
+                    }
+                    .stroke(stroke, style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
+                    KingBodyShape()
+                        .fill(fill)
+                        .overlay(KingBodyShape().stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.48, height: h * 0.52)
+                        .offset(y: -h * 0.02)
+                    RoundedRectangle(cornerRadius: h * 0.05)
+                        .fill(fill)
+                        .overlay(RoundedRectangle(cornerRadius: h * 0.05).stroke(stroke, lineWidth: 1.5))
+                        .frame(width: w * 0.5, height: h * 0.1)
+                        .offset(y: h * 0.3)
+                }
             }
         }
     }
@@ -190,6 +260,63 @@ struct PawnBodyShape: Shape {
         path.move(to: CGPoint(x: rect.minX + rect.width * 0.2, y: rect.maxY))
         path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.minY), control: CGPoint(x: rect.minX + rect.width * 0.28, y: rect.minY + rect.height * 0.18))
         path.addQuadCurve(to: CGPoint(x: rect.maxX - rect.width * 0.2, y: rect.maxY), control: CGPoint(x: rect.maxX - rect.width * 0.28, y: rect.minY + rect.height * 0.18))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct BishopShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + rect.width * 0.18, y: rect.minY + rect.height * 0.46), control: CGPoint(x: rect.minX + rect.width * 0.18, y: rect.minY + rect.height * 0.18))
+        path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.maxY), control: CGPoint(x: rect.minX + rect.width * 0.18, y: rect.maxY - rect.height * 0.05))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - rect.width * 0.18, y: rect.minY + rect.height * 0.46), control: CGPoint(x: rect.maxX - rect.width * 0.18, y: rect.maxY - rect.height * 0.05))
+        path.addQuadCurve(to: CGPoint(x: rect.midX, y: rect.minY), control: CGPoint(x: rect.maxX - rect.width * 0.18, y: rect.minY + rect.height * 0.18))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct KnightShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.maxX * 0.78, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.2, y: rect.maxY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + rect.width * 0.36, y: rect.minY + rect.height * 0.48), control: CGPoint(x: rect.minX + rect.width * 0.22, y: rect.minY + rect.height * 0.7))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.18, y: rect.minY + rect.height * 0.32))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.3, y: rect.minY + rect.height * 0.06))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.68, y: rect.minY + rect.height * 0.06))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX * 0.86, y: rect.minY + rect.height * 0.46), control: CGPoint(x: rect.maxX * 0.9, y: rect.minY + rect.height * 0.22))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX * 0.78, y: rect.maxY), control: CGPoint(x: rect.maxX * 0.88, y: rect.maxY - rect.height * 0.18))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct QueenShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + rect.width * 0.12, y: rect.minY + rect.height * 0.28))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.24, y: rect.minY + rect.height * 0.06))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.minY + rect.height * 0.22))
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.24, y: rect.minY + rect.height * 0.06))
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.12, y: rect.minY + rect.height * 0.28))
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.2, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.2, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct KingBodyShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + rect.width * 0.1, y: rect.minY + rect.height * 0.28))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + rect.width * 0.2, y: rect.maxY), control: CGPoint(x: rect.minX + rect.width * 0.08, y: rect.maxY - rect.height * 0.18))
+        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.2, y: rect.maxY))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - rect.width * 0.1, y: rect.minY + rect.height * 0.28), control: CGPoint(x: rect.maxX - rect.width * 0.08, y: rect.maxY - rect.height * 0.18))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + rect.width * 0.1, y: rect.minY + rect.height * 0.28), control: CGPoint(x: rect.midX, y: rect.minY))
         path.closeSubpath()
         return path
     }
