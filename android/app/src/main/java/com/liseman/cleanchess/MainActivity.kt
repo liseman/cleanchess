@@ -21,11 +21,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -65,6 +67,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CleanChessApp() {
     val game = remember { ChessGameState() }
+    var showNewGameConfirmation by remember { mutableStateOf(false) }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -97,9 +100,30 @@ fun CleanChessApp() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                MinimalActionButton("New Game", Modifier.weight(1f)) { game.newGame() }
+                MinimalActionButton("New Game", Modifier.weight(1f)) { showNewGameConfirmation = true }
                 MinimalActionButton("Undo", Modifier.weight(1f)) { game.undoMove() }
             }
+        }
+
+        if (showNewGameConfirmation) {
+            AlertDialog(
+                onDismissRequest = { showNewGameConfirmation = false },
+                title = { Text("Start a new game?") },
+                text = { Text("Your current game will be lost.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showNewGameConfirmation = false
+                        game.newGame()
+                    }) {
+                        Text("New Game")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showNewGameConfirmation = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }

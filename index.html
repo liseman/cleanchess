@@ -142,7 +142,7 @@
     <div id="status">White to move</div>
     <div id="board"></div>
     <div id="controls">
-        <button onclick="newGame()">New Game</button>
+        <button onclick="confirmNewGame()">New Game</button>
         <button onclick="undoMove()">Undo Move</button>
     </div>
 
@@ -161,6 +161,12 @@
         let defaultCastlingRights = () => ({K: true, Q: true, k: true, q: true});
         let castlingRights = defaultCastlingRights();
         
+        function confirmNewGame() {
+            if (moveHistory.length === 0 || confirm('Start a new game? Your current game will be lost.')) {
+                newGame();
+            }
+        }
+
         function initBoard() {
             board = [
                 ['r','n','b','q','k','b','n','r'],

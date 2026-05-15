@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var game = ChessGame()
+    @State private var showingNewGameConfirmation = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -24,7 +25,7 @@ struct ContentView: View {
                     .frame(width: max(boardSize, 0), height: max(boardSize, 0))
                 
                 HStack(spacing: 12) {
-                    MinimalButton(title: "New Game") { game.newGame() }
+                    MinimalButton(title: "New Game") { showingNewGameConfirmation = true }
                     MinimalButton(title: "Undo") { game.undoMove() }
                 }
                 .padding(.bottom, 24)
@@ -33,6 +34,12 @@ struct ContentView: View {
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(Color.white)
+            .alert("Start a new game?", isPresented: $showingNewGameConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("New Game", role: .destructive) { game.newGame() }
+            } message: {
+                Text("Your current game will be lost.")
+            }
         }
     }
 }
